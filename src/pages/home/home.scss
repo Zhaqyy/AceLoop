@@ -1,5 +1,5 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
 
 // Hero Section Styles
 .hero {
@@ -32,22 +32,19 @@
   gap: $spacing-3xl;
   align-items: center;
 
-  @include respond-to(lg) {
-    grid-template-columns: 1fr 1fr;
-    gap: $spacing-3xl;
-  }
+  //   @include respond-to(lg) {
+  //     grid-template-columns: 1fr 1fr;
+  //     gap: $spacing-3xl;
+  //   }
 }
 
 .hero-textContent {
   display: flex;
-  flex-direction: column;
-  gap: $spacing-xl;
-  order: 2;
-
-  @include respond-to(lg) {
-    order: 1;
-    gap: $spacing-2xl;
-  }
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-block: 20vh 5vh;
+  //   gap: $spacing-xl;
 }
 
 .hero-collection {
@@ -62,10 +59,11 @@
 
 .hero-title {
   font-size: $font-size-3xl;
-  font-weight: $font-weight-semibold;
+  font-weight: $font-weight-bold;
   line-height: $line-height-tight;
   color: $text-primary;
   margin: 0;
+  max-width: 20ch;
 
   @include respond-to(md) {
     font-size: $font-size-4xl;
@@ -78,15 +76,16 @@
 }
 
 .hero-subtitle {
-  font-size: $font-size-lg;
+  font-size: $font-size-sm;
   line-height: $line-height-relaxed;
   color: $text-secondary;
   margin: 0;
-  max-width: 600px;
+  max-width: 35ch;
+  margin-block: 0.5rem;
 
-  @include respond-to(lg) {
-    font-size: $font-size-xl;
-  }
+//   @include respond-to(lg) {
+//     font-size: $font-size-xl;
+//   }
 }
 
 .hero-ctaGroup {
@@ -170,9 +169,9 @@
   position: relative;
   box-shadow: $shadow-lg;
 
-//   @include respond-to(lg) {
-//     aspect-ratio: 3 / 4;
-//   }
+  //   @include respond-to(lg) {
+  //     aspect-ratio: 3 / 4;
+  //   }
 }
 
 .hero-placeholderImage {
@@ -188,4 +187,3 @@
   color: $text-light;
   font-weight: $font-weight-medium;
 }
-
