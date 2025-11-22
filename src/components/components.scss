@@ -1,0 +1,67 @@
+// Shared Component Styles
+// Import this file in components that need shared styles
+
+// Common component utilities
+.component-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+.component-section {
+  margin-bottom: $spacing-xl;
+}
+
+.component-title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-md;
+}
+
+.component-subtitle {
+  font-size: $font-size-base;
+  color: $text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+// Common button styles (can be extended in components)
+.btn-base {
+  @include button-reset;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Common input styles
+.input-base {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-size: $font-size-base;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+// Common card/container styles
+.card-base {
+  background: $background-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+}
+

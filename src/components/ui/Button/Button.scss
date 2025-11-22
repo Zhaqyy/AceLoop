@@ -1,0 +1,39 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.button {
+  @include button-reset;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  
+  &.primary {
+    background-color: $primary-color;
+    color: $background-white;
+    
+    &:hover:not(:disabled) {
+      background-color: color.scale($primary-color, $lightness: -10%);
+    }
+  }
+  
+  &.secondary {
+    background-color: $secondary-color;
+    color: $text-primary;
+    
+    &:hover:not(:disabled) {
+      background-color: color.scale($secondary-color, $lightness: -5%);
+    }
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
