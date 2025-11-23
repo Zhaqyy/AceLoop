@@ -1,9 +1,10 @@
+import CircularGallery from "@/components/ui/Slider/Slider";
 import { Button } from "@ui";
 
 const Hero = () => {
   return (
     <section className="hero">
-      <div className="hero-container">
+      {/* <div className="hero-container"> */}
         <div className="hero-content">
           <div className="hero-textContent">
             <div className="hero-textContentGroup">
@@ -18,36 +19,25 @@ const Hero = () => {
             </div>
             <div className="hero-ctaGroup">
               <div className="hero-ctaButton">
-                <Button variant="primary">Shop Collection</Button>
-              </div>
-              <div className="hero-ctaButton">
-                <Button variant="secondary">Explore Products</Button>
+                <Button variant="underline-arrow">Collections</Button>
               </div>
             </div>
-            {/* <div className="hero-stats">
-              <div className="hero-statItem">
-                <span className="hero-statNumber">10K+</span>
-                <span className="hero-statLabel">Happy Customers</span>
-              </div>
-              <div className="hero-statItem">
-                <span className="hero-statNumber">549</span>
-                <span className="hero-statLabel">5-Star Reviews</span>
-              </div>
-              <div className="hero-statItem">
-                <span className="hero-statNumber">10</span>
-                <span className="hero-statLabel">Year Warranty</span>
-              </div>
-            </div> */}
           </div>
           <div className="hero-imageContent">
-            <div className="hero-imageWrapper">
-              <div className="hero-placeholderImage">
-                <span className="hero-imageLabel">Hero Product Image</span>
-              </div>
-            </div>
+            <CircularGallery
+              bend={-2.5}
+              textColor="#000"
+              borderRadius={0.05}
+              scrollEase={0.02}
+              itemSize={1.25}
+              itemPadding={4}
+              showText={false}
+              lazyLoad={false}
+              ariaLabel="Featured products gallery"
+            />
           </div>
         </div>
-      </div>
+      {/* </div> */}
     </section>
   );
 };
