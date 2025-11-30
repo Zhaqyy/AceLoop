@@ -19,7 +19,7 @@ const Hero = () => {
             </div>
             <div className="hero-ctaGroup">
               <div className="hero-ctaButton">
-                <Button variant="underline-arrow">Collections</Button>
+                <Button variant="underline-arrow" to="/product">Collections</Button>
               </div>
             </div>
           </div>

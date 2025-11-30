@@ -1,0 +1,152 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.customization-options {
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &-item {
+    @include button-reset;
+    padding: $spacing-sm $spacing-md;
+    text-align: left;
+    font-size: $font-size-base;
+    color: $text-primary;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $primary-color;
+      background-color: $background-light;
+    }
+
+    &.selected {
+      border-color: $primary-color;
+      background-color: $primary-color;
+      color: $background-white;
+    }
+  }
+
+  &-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
+  &-swatch-group {
+    @include flex-row;
+    align-items: center;
+    gap: $spacing-md;
+}
+
+  &-category {
+    width: 100%;
+    margin-bottom: $spacing-lg;
+    border: 1px solid $border-color;
+    padding: $spacing-md;
+    border-radius: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &-category-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-swatch {
+    @include button-reset;
+    @include flex-column;
+    align-items: center;
+    gap: $spacing-xs;
+    cursor: pointer;
+    transition: transform $transition-fast;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &.selected {
+      .customization-options-swatch-color {
+        border: 2px solid $primary-color;
+        box-shadow: $shadow-md;
+      }
+    }
+  }
+
+  &-swatch-color {
+    width: 60px;
+    height: 60px;
+    border-radius: $radius-sm;
+    border: 2px solid $border-color;
+    transition: all $transition-fast;
+  }
+
+  &-swatch-label {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+    text-align: center;
+  }
+
+  &-leg-styles {
+    display: flex;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+
+  &-leg-style {
+    @include button-reset;
+    @include flex-column;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    border: 2px solid $border-color;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-fast;
+    min-width: 100px;
+
+    &:hover {
+      border-color: $primary-color;
+      background-color: $background-light;
+    }
+
+    &.selected {
+      border-color: $primary-color;
+      background-color: $primary-color;
+      color: $background-white;
+    }
+  }
+
+  &-leg-style-icon {
+    font-size: $font-size-2xl;
+    width: 40px;
+    height: 40px;
+    @include flex-center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: $radius-sm;
+  }
+
+  &-leg-style-label {
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &-empty {
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    padding: $spacing-md;
+    text-align: center;
+  }
+}
+

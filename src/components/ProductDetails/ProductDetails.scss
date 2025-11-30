@@ -1,0 +1,51 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.product-details {
+  margin-bottom: $spacing-xl;
+
+  &-header {
+    margin-bottom: $spacing-sm;
+  }
+
+  &-name {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-xs;
+    line-height: $line-height-tight;
+
+    @include respond-to(md) {
+      font-size: $font-size-4xl;
+    }
+  }
+
+  &-collection {
+    font-size: $font-size-base;
+    color: $text-secondary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-rating {
+    margin-top: $spacing-sm;
+  }
+
+  &-price {
+    @include flex-row;
+    gap: $spacing-xs;
+    margin-top: $spacing-xs;
+    align-items: baseline;
+  }
+
+  &-price-amount {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+
+  &-price-note,
+  &-price-shipping {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+}
+

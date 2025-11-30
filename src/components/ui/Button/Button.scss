@@ -12,10 +12,20 @@
   align-items: center;
   justify-content: center;
   gap: $spacing-sm;
+  text-decoration: none;
+  cursor: pointer;
+  
+  // Support for anchor tags and Link components
+  &:is(a) {
+    text-decoration: none;
+  }
   
   &.primary {
     background-color: $primary-color;
     color: $background-white;
+    padding: $spacing-md $spacing-xl;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
     
     &:hover:not(:disabled) {
       background-color: color.scale($primary-color, $lightness: -10%);
@@ -88,9 +98,11 @@
     }
   }
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
   }
 }
 

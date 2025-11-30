@@ -1,0 +1,69 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.accordion {
+  border-bottom: 1px solid $border-color;
+  
+&:first-child{
+  border-top: 1px solid $border-color;
+}
+
+  &-header {
+    @include button-reset;
+    width: 100%;
+    padding: $spacing-lg 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  &-header-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+  }
+
+  &-count {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+
+  &-icon {
+    transition: transform $transition-base;
+    color: $text-secondary;
+    flex-shrink: 0;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &-content {
+    padding-bottom: $spacing-lg;
+    animation: slideDown $transition-base;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

@@ -1,0 +1,43 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.tabs {
+  &-header {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid $border-color;
+    margin-bottom: $spacing-lg;
+    border-radius: 1.5rem;
+    outline: 1px solid black;
+    outline-offset: 2px;
+  }
+
+  &-tab {
+    width: 100%;
+    border-radius: 1.5rem;
+    @include button-reset;
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+    background-color: transparent;
+    border-bottom: 2px solid transparent;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      color: $text-primary;
+    }
+
+    &.active {
+      color: $text-primary;
+      background-color: $primary-color;
+      color: $background-white;
+    }
+  }
+
+  &-content {
+    min-height: 100px;
+  }
+}
+

@@ -43,6 +43,11 @@
   flex-direction: column;
 }
 
+@mixin flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
 // Truncate Text
 @mixin truncate {
   overflow: hidden;

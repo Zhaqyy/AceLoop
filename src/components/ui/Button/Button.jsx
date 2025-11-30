@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./Button.scss";
 
 /* eslint-disable react/prop-types */
@@ -5,9 +6,11 @@ import "./Button.scss";
  * Button component with multiple variants
  * @param {React.ReactNode} children - Button content
  * @param {string} variant - Button variant: 'primary', 'secondary', or 'underline-arrow'
- * @param {object} props - Additional button props
+ * @param {string} to - React Router link path (renders as Link)
+ * @param {string} href - External link URL (renders as anchor tag)
+ * @param {object} props - Additional button/link props
  */
-const Button = ({ children, variant = "primary", ...props }) => {
+const Button = ({ children, variant = "primary", to, href, ...props }) => {
   // Arrow SVG for underline-arrow variant
   const ArrowIcon = () => (
     <svg
@@ -21,18 +24,49 @@ const Button = ({ children, variant = "primary", ...props }) => {
     </svg>
   );
 
-  if (variant === "underline-arrow") {
-    return (
-      <button className={`button ${variant}`} {...props}>
+  const { disabled, ...restProps } = props;
+  const className = `button ${variant}${disabled ? ' disabled' : ''}`;
+  const content =
+    variant === "underline-arrow" ? (
+      <>
         <span className="button-underline-text">{children}</span>
         <ArrowIcon />
+      </>
+    ) : (
+      children
+    );
+
+  // If disabled, always render as button to prevent navigation
+  if (disabled) {
+    return (
+      <button className={className} disabled {...restProps}>
+        {content}
       </button>
     );
   }
 
+  // Render as React Router Link if 'to' prop is provided
+  if (to) {
+    return (
+      <Link to={to} className={className} {...restProps}>
+        {content}
+      </Link>
+    );
+  }
+
+  // Render as anchor tag if 'href' prop is provided
+  if (href) {
+    return (
+      <a href={href} className={className} {...restProps}>
+        {content}
+      </a>
+    );
+  }
+
+  // Default: render as button
   return (
-    <button className={`button ${variant}`} {...props}>
-      {children}
+    <button className={className} {...restProps}>
+      {content}
     </button>
   );
 };
