@@ -1,7 +1,7 @@
 import { Camera, Mesh, Plane, Program, Renderer, Texture, Transform } from 'ogl';
 import { useEffect, useRef } from 'react';
 
-import './Slider.scss';
+import '../ui.scss';
 
 function debounce(func, wait) {
   let timeout;
@@ -163,11 +163,17 @@ class Media {
   }
   createShader() {
     const texture = new Texture(this.gl, {
-      generateMipmaps: true
+      generateMipmaps: true,
+      premultiplyAlpha: false
     });
     this.program = new Program(this.gl, {
       depthTest: false,
       depthWrite: false,
+      blendFunc: {
+        src: this.gl.SRC_ALPHA,
+        dst: this.gl.ONE_MINUS_SRC_ALPHA
+      },
+      blend: true,
       vertex: `
         precision highp float;
         attribute vec3 position;
@@ -212,9 +218,12 @@ class Media {
           
           // Smooth antialiasing for edges
           float edgeSmooth = 0.002;
-          float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
+          float borderAlpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
           
-          gl_FragColor = vec4(color.rgb, alpha);
+          // Combine texture alpha with border alpha for proper transparency
+          float finalAlpha = color.a * borderAlpha;
+          
+          gl_FragColor = vec4(color.rgb, finalAlpha);
         }
       `,
       uniforms: {
@@ -270,26 +279,63 @@ class Media {
     });
   }
   update(scroll, direction) {
-    this.plane.position.x = this.x - scroll.current - this.extra;
-
-    const x = this.plane.position.x;
-    const H = this.viewport.width / 2;
-
-    if (this.bend === 0) {
-      this.plane.position.y = 0;
-      this.plane.rotation.z = 0;
+    // Check if we want a true 360° ring (bend >= 360 or special value)
+    const isFullRing = this.bend >= 360 || this.bend === -360;
+    
+    if (isFullRing) {
+      // True 360° ring calculation
+      // Calculate radius based on viewport to ensure items fit in view
+      const H = Math.min(this.viewport.width, this.viewport.height) / 2;
+      // Use itemPadding to control ring radius (acts as radius multiplier)
+      // itemPadding = 1: tight ring (30% of viewport)
+      // itemPadding = 5: medium ring (50% of viewport)  
+      // itemPadding = 10: wide ring (70% of viewport)
+      // Higher values = larger radius
+      const radiusMultiplier = Math.max(0.2, Math.min(0.9, 0.2 + (this.itemPadding / 10) * 0.5));
+      const radius = H * radiusMultiplier;
+      
+      // Calculate angle for this item based on its index
+      // Each item gets an equal portion of the circle
+      const anglePerItem = (2 * Math.PI) / this.length;
+      const baseAngle = this.index * anglePerItem;
+      
+      // Add scroll rotation to animate the ring
+      // Convert scroll position to rotation angle (negated for correct direction)
+      const scrollRotation = -(scroll.current / this.width) * anglePerItem;
+      const angle = baseAngle + scrollRotation;
+      
+      // Position items in a perfect circle (centered at origin)
+      this.plane.position.x = Math.sin(angle) * radius;
+      this.plane.position.y = -Math.cos(angle) * radius;
+      this.plane.position.z = 0;
+      
+      // Rotate plane so top of image faces the center (inward)
+      // angle points to the item's position, so we add PI to flip it to face center
+      this.plane.rotation.z = angle + Math.PI;
+      this.plane.rotation.y = 0;
     } else {
-      const B_abs = Math.abs(this.bend);
-      const R = (H * H + B_abs * B_abs) / (2 * B_abs);
-      const effectiveX = Math.min(Math.abs(x), H);
+      // Original linear/arc calculation
+      this.plane.position.x = this.x - scroll.current - this.extra;
+      const x = this.plane.position.x;
+      const H = this.viewport.width / 2;
 
-      const arc = R - Math.sqrt(R * R - effectiveX * effectiveX);
-      if (this.bend > 0) {
-        this.plane.position.y = -arc;
-        this.plane.rotation.z = -Math.sign(x) * Math.asin(effectiveX / R);
+      if (this.bend === 0) {
+        this.plane.position.y = 0;
+        this.plane.rotation.z = 0;
       } else {
-        this.plane.position.y = arc;
-        this.plane.rotation.z = Math.sign(x) * Math.asin(effectiveX / R);
+        // Original arc calculation for partial curves
+        const B_abs = Math.abs(this.bend);
+        const R = (H * H + B_abs * B_abs) / (2 * B_abs);
+        const effectiveX = Math.min(Math.abs(x), H);
+
+        const arc = R - Math.sqrt(R * R - effectiveX * effectiveX);
+        if (this.bend > 0) {
+          this.plane.position.y = -arc;
+          this.plane.rotation.z = -Math.sign(x) * Math.asin(effectiveX / R);
+        } else {
+          this.plane.position.y = arc;
+          this.plane.rotation.z = Math.sign(x) * Math.asin(effectiveX / R);
+        }
       }
     }
 
@@ -309,17 +355,20 @@ class Media {
       }
     }
 
-    const planeOffset = this.plane.scale.x / 2;
-    const viewportOffset = this.viewport.width / 2;
-    this.isBefore = this.plane.position.x + planeOffset < -viewportOffset;
-    this.isAfter = this.plane.position.x - planeOffset > viewportOffset;
-    if (direction === 'right' && this.isBefore) {
-      this.extra -= this.widthTotal;
-      this.isBefore = this.isAfter = false;
-    }
-    if (direction === 'left' && this.isAfter) {
-      this.extra += this.widthTotal;
-      this.isBefore = this.isAfter = false;
+    // Skip wrapping logic for full ring mode (it's already circular)
+    if (!(this.bend >= 360 || this.bend === -360)) {
+      const planeOffset = this.plane.scale.x / 2;
+      const viewportOffset = this.viewport.width / 2;
+      this.isBefore = this.plane.position.x + planeOffset < -viewportOffset;
+      this.isAfter = this.plane.position.x - planeOffset > viewportOffset;
+      if (direction === 'right' && this.isBefore) {
+        this.extra -= this.widthTotal;
+        this.isBefore = this.isAfter = false;
+      }
+      if (direction === 'left' && this.isAfter) {
+        this.extra += this.widthTotal;
+        this.isBefore = this.isAfter = false;
+      }
     }
   }
   onResize({ screen, viewport } = {}) {
@@ -346,6 +395,7 @@ class App {
     container,
     {
       items,
+      images,
       bend,
       textColor = '#ffffff',
       borderRadius = 0,
@@ -358,13 +408,19 @@ class App {
       showText = true,
       lazyLoad = false,
       breakpoints = null,
-      ariaLabel = 'Image gallery slider'
+      ariaLabel = 'Image gallery slider',
+      seamlessScroll = false, // When true, slider responds to scroll without preventing default
+      disableSnap = false, // When true, disables snapping to items for smooth continuous scrolling
+      inertiaDeceleration = 0.95 // Friction factor for inertia (0.95 = 5% reduction per frame, only used when disableSnap is true)
     } = {}
   ) {
     document.documentElement.classList.remove('no-js');
     this.container = container;
     this.scrollSpeed = scrollSpeed;
-    this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
+    this.disableSnap = disableSnap;
+    // Use smoother easing when snap is disabled for more fluid motion
+    const effectiveEase = this.disableSnap ? Math.max(scrollEase, 0.08) : scrollEase;
+    this.scroll = { ease: effectiveEase, current: 0, target: 0, last: 0 };
     this.itemSize = itemSize;
     this.itemPadding = itemPadding;
     this.scaleBase = scaleBase;
@@ -372,10 +428,21 @@ class App {
     this.lazyLoad = lazyLoad;
     this.breakpoints = breakpoints;
     this.ariaLabel = ariaLabel;
+    this.seamlessScroll = seamlessScroll;
     this.currentItemIndex = 0;
     this.wheelDelta = 0;
     this.wheelTimeout = null;
     this.onCheckDebounce = debounce(this.onCheck, 200);
+    this.lastWheelTime = 0;
+    this.momentumActive = false;
+    this.momentumDeceleration = inertiaDeceleration; // Friction factor for inertia
+    this.lastTouchTime = 0;
+    this.lastTouchDistance = 0;
+    this.isInView = false;
+    this.isHovered = false;
+    this.isPaused = false;
+    this.intersectionObserver = null;
+    this.scrollListener = null;
     
     // Accessibility: Add ARIA attributes
     this.container.setAttribute('role', 'region');
@@ -388,7 +455,8 @@ class App {
     this.createScene();
     this.onResize();
     this.createGeometry();
-    this.createMedias(items, bend, textColor, borderRadius, font);
+    this.createMedias(items, images, bend, textColor, borderRadius, font);
+    this.setupIntersectionObserver();
     this.update();
     this.addEventListeners();
   }
@@ -396,11 +464,23 @@ class App {
     this.renderer = new Renderer({
       alpha: true,
       antialias: true,
+      premultipliedAlpha: false,
       dpr: Math.min(window.devicePixelRatio || 1, 2)
     });
     this.gl = this.renderer.gl;
     this.gl.clearColor(0, 0, 0, 0);
-    this.container.appendChild(this.gl.canvas);
+    
+    // Enable proper blending for transparency
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    
+    // Ensure canvas fills container
+    const canvas = this.gl.canvas;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.display = 'block';
+    
+    this.container.appendChild(canvas);
   }
   createCamera() {
     this.camera = new Camera(this.gl);
@@ -416,7 +496,7 @@ class App {
       widthSegments: 100
     });
   }
-  createMedias(items, bend = 1, textColor, borderRadius, font) {
+  createMedias(items, images, bend = 1, textColor, borderRadius, font) {
     const defaultItems = [
       { image: `https://picsum.photos/seed/1/800/600?grayscale`, text: 'Bridge' },
       { image: `https://picsum.photos/seed/2/800/600?grayscale`, text: 'Desk Setup' },
@@ -431,7 +511,22 @@ class App {
       { image: `https://picsum.photos/seed/21/800/600?grayscale`, text: 'Coastline' },
       { image: `https://picsum.photos/seed/12/800/600?grayscale`, text: 'Palm Trees' }
     ];
-    const galleryItems = items && items.length ? items : defaultItems;
+    
+    // Normalize images prop to items format
+    let normalizedItems = null;
+    if (images && images.length) {
+      normalizedItems = images.map(img => {
+        if (typeof img === 'string') {
+          return { image: img, text: '' };
+        } else if (img && typeof img === 'object' && img.image) {
+          return { image: img.image, text: img.text || '' };
+        }
+        return null;
+      }).filter(item => item !== null);
+    }
+    
+    // Use images if provided, otherwise items, otherwise defaultItems
+    const galleryItems = normalizedItems || (items && items.length ? items : defaultItems);
     this.mediasImages = galleryItems.concat(galleryItems);
     
     // Get responsive item size
@@ -464,21 +559,150 @@ class App {
     });
   }
   onTouchDown(e) {
+    // Only handle touch if slider is in view
+    if (!this.isInView) return;
+    
+    // Check if touch is within container bounds
+    const rect = this.container.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    
+    if (
+      touch.clientX < rect.left ||
+      touch.clientX > rect.right ||
+      touch.clientY < rect.top ||
+      touch.clientY > rect.bottom
+    ) {
+      return;
+    }
+    
     this.isDown = true;
     this.scroll.position = this.scroll.current;
-    this.start = e.touches ? e.touches[0].clientX : e.clientX;
+    this.start = touch.clientX;
   }
   onTouchMove(e) {
-    if (!this.isDown) return;
+    if (!this.isDown || !this.isInView) return;
     const x = e.touches ? e.touches[0].clientX : e.clientX;
     const distance = (this.start - x) * (this.scrollSpeed * 0.025);
     this.scroll.target = this.scroll.position + distance;
+    
+    // Track velocity for momentum on touch (only if snap is disabled)
+    if (this.disableSnap) {
+      const now = Date.now();
+      const timeDelta = now - (this.lastTouchTime || now);
+      if (timeDelta > 0) {
+        const currentDistance = (this.start - x) * (this.scrollSpeed * 0.025);
+        const previousDistance = this.lastTouchDistance || 0;
+        const distanceDelta = currentDistance - previousDistance;
+        this.scroll.velocity = distanceDelta / (timeDelta / 16); // Normalize to 60fps
+        this.lastTouchTime = now;
+        this.lastTouchDistance = currentDistance;
+      }
+      this.momentumActive = false; // Reset momentum during active drag
+    }
   }
   onTouchUp() {
+    if (!this.isDown) return;
     this.isDown = false;
-    this.onCheck();
+    
+    // Start momentum if there's significant velocity (only if snap is disabled)
+    if (this.disableSnap) {
+      if (Math.abs(this.scroll.velocity) > 0.1) {
+        this.momentumActive = true;
+      } else {
+        this.scroll.velocity = 0;
+      }
+    }
+    
+    this.lastTouchTime = 0;
+    this.lastTouchDistance = 0;
+    
+    if (!this.disableSnap && !this.momentumActive) {
+      this.onCheck();
+    }
   }
   onWheel(e) {
+    // Seamless scroll mode: respond to scroll without preventing default
+    if (this.seamlessScroll) {
+      if (!this.isInView) {
+        return;
+      }
+      
+      // Check if mouse is over container
+      const rect = this.container.getBoundingClientRect();
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      if (
+        mouseX < rect.left ||
+        mouseX > rect.right ||
+        mouseY < rect.top ||
+        mouseY > rect.bottom
+      ) {
+        return;
+      }
+      
+      // Don't prevent default - allow page to scroll
+      // But still update slider based on scroll delta
+      const delta = e.deltaY || e.wheelDelta || e.detail;
+      const normalizedDelta = Math.sign(delta) * Math.min(Math.abs(delta), 120);
+      
+      // Accumulate wheel delta for smoother scrolling
+      this.wheelDelta += normalizedDelta;
+      
+      // Clear timeout if it exists
+      if (this.wheelTimeout) {
+        clearTimeout(this.wheelTimeout);
+      }
+      
+    // Apply scroll with momentum (reduced sensitivity for seamless mode)
+    const scrollAmount = (this.wheelDelta / 120) * this.scrollSpeed * 0.15;
+    this.scroll.target += scrollAmount;
+    
+    // Track velocity for inertia (only if snap is disabled)
+    if (this.disableSnap) {
+      const now = Date.now();
+      const timeDelta = now - this.lastWheelTime || 16; // Default to 60fps if first event
+      this.scroll.velocity = scrollAmount / (timeDelta / 16); // Normalize to 60fps
+      this.lastWheelTime = now;
+      this.momentumActive = false; // Reset momentum when actively scrolling
+    }
+    
+    // Reset wheel delta after a short delay
+    this.wheelTimeout = setTimeout(() => {
+      this.wheelDelta = 0;
+      // Start momentum when wheel stops (only if snap is disabled)
+      if (this.disableSnap && Math.abs(this.scroll.velocity) > 0.01) {
+        this.momentumActive = true;
+      }
+    }, 150);
+    
+    // Only snap if not disabled
+    if (!this.disableSnap) {
+      this.onCheckDebounce();
+    }
+    return;
+    }
+    
+    // Original behavior: prevent default when hovering
+    // Only handle scroll if slider is in view and mouse is over the container
+    if (!this.isInView || !this.isHovered) {
+      return;
+    }
+    
+    // Check if the event target is within the container
+    const rect = this.container.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    if (
+      mouseX < rect.left ||
+      mouseX > rect.right ||
+      mouseY < rect.top ||
+      mouseY > rect.bottom
+    ) {
+      return;
+    }
+    
     e.preventDefault();
     
     // Improved wheel detection with momentum
@@ -494,15 +718,114 @@ class App {
     }
     
     // Apply scroll with momentum
-    const scrollAmount = (this.wheelDelta / 120) * this.scrollSpeed * 0.3;
+    // Use smoother, more direct scrolling when snap is disabled
+    const sensitivity = this.disableSnap ? 0.4 : 0.3;
+    const scrollAmount = (this.wheelDelta / 120) * this.scrollSpeed * sensitivity;
     this.scroll.target += scrollAmount;
     
-    // Reset wheel delta after a short delay
+    // Track velocity for inertia (only if snap is disabled)
+    if (this.disableSnap) {
+      const now = Date.now();
+      const timeDelta = now - this.lastWheelTime || 16; // Default to 60fps if first event
+      this.scroll.velocity = scrollAmount / (timeDelta / 16); // Normalize to 60fps
+      this.lastWheelTime = now;
+      this.momentumActive = false; // Reset momentum when actively scrolling
+    }
+    
+    // Reset wheel delta after a short delay (shorter for smoother feel when snap disabled)
+    const resetDelay = this.disableSnap ? 100 : 150;
     this.wheelTimeout = setTimeout(() => {
       this.wheelDelta = 0;
-    }, 150);
+      // Start momentum when wheel stops (only if snap is disabled)
+      if (this.disableSnap && Math.abs(this.scroll.velocity) > 0.01) {
+        this.momentumActive = true;
+      }
+    }, resetDelay);
     
-    this.onCheckDebounce();
+    // Only snap if not disabled
+    if (!this.disableSnap) {
+      this.onCheckDebounce();
+    }
+  }
+  
+  onPageScroll() {
+    // In seamless mode, optionally respond to page scroll when in view
+    // This is disabled by default to prioritize wheel events
+    // Can be enabled if you want slider to progress with page scroll
+    if (!this.seamlessScroll || !this.isInView) {
+      return;
+    }
+    
+    // Only update if there's no recent wheel activity
+    // This prevents conflicts between wheel and page scroll
+    if (this.wheelDelta !== 0) {
+      return;
+    }
+    
+    const rect = this.container.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportCenter = viewportHeight / 2;
+    
+    // Calculate slider center position
+    const sliderCenter = rect.top + rect.height / 2;
+    
+    // Only respond when slider center is near viewport center
+    const distanceFromCenter = Math.abs(sliderCenter - viewportCenter);
+    const maxDistance = viewportHeight * 0.6; // Only respond when within 60% of viewport
+    
+    if (distanceFromCenter > maxDistance) {
+      return;
+    }
+    
+    // Calculate scroll progress based on position relative to viewport center
+    const scrollProgress = Math.max(0, Math.min(1, 
+      1 - (distanceFromCenter / maxDistance)
+    ));
+    
+    // Map scroll progress to slider position (subtle effect)
+    if (this.medias && this.medias[0]) {
+      const totalWidth = this.medias[0].widthTotal;
+      const targetPosition = -scrollProgress * totalWidth * 0.3; // Reduced multiplier for subtlety
+      // Smoothly interpolate to avoid jarring movements
+      this.scroll.target = lerp(this.scroll.target, targetPosition, 0.05);
+    }
+  }
+  
+  setupIntersectionObserver() {
+    // Use Intersection Observer to detect when slider enters/leaves viewport
+    const options = {
+      root: null,
+      rootMargin: '50px', // Start checking slightly before entering viewport
+      threshold: 0.1 // Trigger when 10% visible
+    };
+    
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        this.isInView = entry.isIntersecting;
+        if (!this.isInView) {
+          // Reset wheel delta when leaving view
+          this.wheelDelta = 0;
+        }
+      });
+    }, options);
+    
+    this.intersectionObserver.observe(this.container);
+    
+    // In seamless mode, also listen to page scroll
+    if (this.seamlessScroll) {
+      this.scrollListener = this.onPageScroll.bind(this);
+      window.addEventListener('scroll', this.scrollListener, { passive: true });
+    }
+  }
+  
+  onMouseEnter() {
+    this.isHovered = true;
+  }
+  
+  onMouseLeave() {
+    this.isHovered = false;
+    // Reset wheel delta when mouse leaves
+    this.wheelDelta = 0;
   }
   
   onKeyDown(e) {
@@ -518,7 +841,9 @@ class App {
         e.preventDefault();
         newTarget -= width;
         this.scroll.target = newTarget;
-        this.onCheck();
+        if (!this.disableSnap) {
+          this.onCheck();
+        }
         this.updateAriaLabel();
         break;
       case 'ArrowRight':
@@ -526,13 +851,17 @@ class App {
         e.preventDefault();
         newTarget += width;
         this.scroll.target = newTarget;
-        this.onCheck();
+        if (!this.disableSnap) {
+          this.onCheck();
+        }
         this.updateAriaLabel();
         break;
       case 'Home':
         e.preventDefault();
         this.scroll.target = 0;
-        this.onCheck();
+        if (!this.disableSnap) {
+          this.onCheck();
+        }
         this.updateAriaLabel();
         break;
       case 'End':
@@ -541,7 +870,9 @@ class App {
           const totalWidth = this.medias[0].widthTotal;
           this.scroll.target = -totalWidth / 2;
         }
-        this.onCheck();
+        if (!this.disableSnap) {
+          this.onCheck();
+        }
         this.updateAriaLabel();
         break;
     }
@@ -558,6 +889,9 @@ class App {
     }
   }
   onCheck() {
+    // Skip snapping if disabled
+    if (this.disableSnap) return;
+    
     if (!this.medias || !this.medias[0]) return;
     const width = this.medias[0].width;
     const itemIndex = Math.round(Math.abs(this.scroll.target) / width);
@@ -565,10 +899,19 @@ class App {
     this.scroll.target = this.scroll.target < 0 ? -item : item;
   }
   onResize() {
+    // Get actual container dimensions
+    const rect = this.container.getBoundingClientRect();
     this.screen = {
-      width: this.container.clientWidth,
-      height: this.container.clientHeight
+      width: rect.width || this.container.clientWidth,
+      height: rect.height || this.container.clientHeight
     };
+    
+    // Ensure we have valid dimensions
+    if (this.screen.width === 0 || this.screen.height === 0) {
+      this.screen.width = window.innerWidth;
+      this.screen.height = window.innerHeight;
+    }
+    
     this.renderer.setSize(this.screen.width, this.screen.height);
     this.camera.perspective({
       aspect: this.screen.width / this.screen.height
@@ -590,7 +933,31 @@ class App {
     }
   }
   update() {
+    // Only update if in view or if there's active scrolling
+    if (!this.isInView && Math.abs(this.scroll.current - this.scroll.target) < 0.01 && !this.momentumActive) {
+      // Pause animation when out of view and not scrolling
+      this.raf = window.requestAnimationFrame(this.update.bind(this));
+      return;
+    }
+    
+    // Apply momentum/inertia when active (only if snap is disabled)
+    if (this.disableSnap && this.momentumActive && Math.abs(this.scroll.velocity) > 0.01) {
+      // Apply velocity to target
+      this.scroll.target += this.scroll.velocity;
+      
+      // Decelerate velocity (friction)
+      this.scroll.velocity *= this.momentumDeceleration;
+      
+      // Stop momentum when velocity is too small
+      if (Math.abs(this.scroll.velocity) < 0.01) {
+        this.scroll.velocity = 0;
+        this.momentumActive = false;
+      }
+    }
+    
+    // Always lerp current to target for smooth motion
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
+    
     const direction = this.scroll.current > this.scroll.last ? 'right' : 'left';
     if (this.medias) {
       this.medias.forEach(media => media.update(this.scroll, direction));
@@ -612,9 +979,12 @@ class App {
     this.boundOnTouchMove = this.onTouchMove.bind(this);
     this.boundOnTouchUp = this.onTouchUp.bind(this);
     this.boundOnKeyDown = this.onKeyDown.bind(this);
+    this.boundOnMouseEnter = this.onMouseEnter.bind(this);
+    this.boundOnMouseLeave = this.onMouseLeave.bind(this);
     
     window.addEventListener('resize', this.boundOnResize);
-    window.addEventListener('mousewheel', this.boundOnWheel);
+    // Only attach wheel listeners to window, but check if in view and hovered
+    window.addEventListener('mousewheel', this.boundOnWheel, { passive: false });
     window.addEventListener('wheel', this.boundOnWheel, { passive: false });
     window.addEventListener('mousedown', this.boundOnTouchDown);
     window.addEventListener('mousemove', this.boundOnTouchMove);
@@ -623,6 +993,10 @@ class App {
     window.addEventListener('touchmove', this.boundOnTouchMove);
     window.addEventListener('touchend', this.boundOnTouchUp);
     
+    // Track mouse hover state
+    this.container.addEventListener('mouseenter', this.boundOnMouseEnter);
+    this.container.addEventListener('mouseleave', this.boundOnMouseLeave);
+    
     // Accessibility: Keyboard navigation
     this.container.addEventListener('keydown', this.boundOnKeyDown);
   }
@@ -630,6 +1004,12 @@ class App {
     window.cancelAnimationFrame(this.raf);
     if (this.wheelTimeout) {
       clearTimeout(this.wheelTimeout);
+    }
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener);
     }
     window.removeEventListener('resize', this.boundOnResize);
     window.removeEventListener('mousewheel', this.boundOnWheel);
@@ -640,6 +1020,8 @@ class App {
     window.removeEventListener('touchstart', this.boundOnTouchDown);
     window.removeEventListener('touchmove', this.boundOnTouchMove);
     window.removeEventListener('touchend', this.boundOnTouchUp);
+    this.container.removeEventListener('mouseenter', this.boundOnMouseEnter);
+    this.container.removeEventListener('mouseleave', this.boundOnMouseLeave);
     this.container.removeEventListener('keydown', this.boundOnKeyDown);
     if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
       this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas);
@@ -651,6 +1033,7 @@ class App {
 /**
  * CircularGallery - A 3D WebGL slider component with curved layout
  * @param {Array} items - Array of items with image and text properties
+ * @param {Array} images - Array of image URLs (strings) or objects with image property to replace default images
  * @param {number} bend - Curvature amount (0 = flat, higher = more curved)
  * @param {string} textColor - Color of the text labels
  * @param {number} borderRadius - Border radius of items (0-1 range)
@@ -664,9 +1047,13 @@ class App {
  * @param {boolean} lazyLoad - Enable lazy loading for images (default: false)
  * @param {Array} breakpoints - Responsive breakpoints array: [{maxWidth: 768, itemSize: 0.8}, ...]
  * @param {string} ariaLabel - ARIA label for accessibility (default: 'Image gallery slider')
+ * @param {boolean} seamlessScroll - When true, slider responds to scroll without preventing default, allowing seamless page scrolling (default: false)
+ * @param {boolean} disableSnap - When true, disables snapping to items for smooth continuous scrolling (default: false)
+ * @param {number} inertiaDeceleration - Friction factor for inertia scrolling (0.95 = 5% reduction per frame, only used when disableSnap is true, default: 0.95)
  */
 export default function CircularGallery({
   items,
+  images,
   bend = 3,
   textColor = '#ffffff',
   borderRadius = 0.05,
@@ -679,12 +1066,16 @@ export default function CircularGallery({
   showText = true,
   lazyLoad = false,
   breakpoints = null,
-  ariaLabel = 'Image gallery slider'
+  ariaLabel = 'Image gallery slider',
+  seamlessScroll = false,
+  disableSnap = false,
+  inertiaDeceleration = 0.95
 }) {
   const containerRef = useRef(null);
   useEffect(() => {
     const app = new App(containerRef.current, { 
-      items, 
+      items,
+      images, 
       bend, 
       textColor, 
       borderRadius, 
@@ -697,11 +1088,14 @@ export default function CircularGallery({
       showText,
       lazyLoad,
       breakpoints,
-      ariaLabel
+      ariaLabel,
+      seamlessScroll,
+      disableSnap,
+      inertiaDeceleration
     });
     return () => {
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, itemSize, itemPadding, scaleBase, showText, lazyLoad, breakpoints, ariaLabel]);
+  }, [items, images, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, itemSize, itemPadding, scaleBase, showText, lazyLoad, breakpoints, ariaLabel, seamlessScroll, disableSnap, inertiaDeceleration]);
   return <div className="circular-gallery" ref={containerRef} />;
 }

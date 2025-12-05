@@ -1,7 +1,7 @@
-import ProductGallery from '@/components/ProductGallery/ProductGallery';
-import ProductDetails from '@/components/ProductDetails/ProductDetails';
-import CustomizationOptions from '@/components/CustomizationOptions/CustomizationOptions';
-import ProductActions from '@/components/ProductActions/ProductActions';
+import ProductGallery from '@/components/Product/ProductGallery';
+import ProductDetails from '@/components/Product/ProductDetails';
+import CustomizationOptions from '@/components/Product/CustomizationOptions';
+import ProductActions from '@/components/Product/ProductActions';
 import './Product.scss';
 
 const Product = () => {

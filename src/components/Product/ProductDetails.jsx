@@ -1,5 +1,5 @@
 import Rating from '../ui/Rating/Rating';
-import './ProductDetails.scss';
+import './ProductComponents.scss';
 
 const ProductDetails = ({ product }) => {
   const {

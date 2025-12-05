@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './ProductGallery.scss';
+import './ProductComponents.scss';
 
 const ProductGallery = ({ images = [] }) => {
   const [selectedImage, setSelectedImage] = useState(0);

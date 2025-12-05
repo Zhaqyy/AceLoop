@@ -2,6 +2,14 @@ import CircularGallery from "@/components/ui/Slider/Slider";
 import { Button } from "@ui";
 
 const Hero = () => {
+  const Images = [
+    { image: '/Products/pconfig.webp' },
+    { image: '/Products/ppacket.webp' },
+    { image: '/Products/plife.webp' },
+    { image: '/Products/plife2.webp' },
+    { image: '/Products/ppacket2.webp' },
+    { image: '/Products/plife3.webp' },
+  ]
   return (
     <section className="hero">
       {/* <div className="hero-container"> */}
@@ -25,12 +33,13 @@ const Hero = () => {
           </div>
           <div className="hero-imageContent">
             <CircularGallery
-              bend={-2.5}
+              images={Images}
+              bend={0}
               textColor="#000"
               borderRadius={0.05}
               scrollEase={0.02}
               itemSize={1.25}
-              itemPadding={4}
+              itemPadding={2}
               showText={false}
               lazyLoad={false}
               ariaLabel="Featured products gallery"

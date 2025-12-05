@@ -1,4 +1,4 @@
-import './Rating.scss';
+import '../ui.scss';
 
 const Rating = ({ rating = 0, reviewCount, showReviewCount = true }) => {
   const fullStars = Math.floor(rating);

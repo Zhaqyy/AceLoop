@@ -1,0 +1,497 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Button Component Styles
+.button {
+  @include button-reset;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-weight-medium;
+  transition: all $transition-slow;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  text-decoration: none;
+  cursor: pointer;
+  
+  // Support for anchor tags and Link components
+  &:is(a) {
+    text-decoration: none;
+  }
+  
+  &.primary {
+    background-color: $primary-color;
+    color: $background-white;
+    padding: $spacing-md $spacing-xl;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    
+    &:hover:not(:disabled) {
+      background-color: color.scale($primary-color, $lightness: -10%);
+    }
+  }
+  
+  &.secondary {
+    background-color: $secondary-color;
+    color: $text-primary;
+    
+    &:hover:not(:disabled) {
+      background-color: color.scale($secondary-color, $lightness: -5%);
+    }
+  }
+  
+  &.underline-arrow {
+    border: none;
+    background: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+
+    .button-underline-text {
+      height: 100%;
+      letter-spacing: 4px;
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      padding-right: 1rem;
+      text-transform: uppercase;
+      position: relative;
+      color: $text-primary;
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        transform: scaleX(0);
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: $text-primary;
+        transform-origin: bottom right;
+        transition: transform $transition-slow;
+      }
+    }
+
+    .button-arrow {
+      transform: rotate(-45deg);
+      transition: all $transition-slow;
+    }
+
+    &:hover {
+      .button-underline-text::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
+      }
+
+      .button-arrow {
+        transform: rotate(0deg);
+      }
+    }
+
+    &:active {
+      .button-arrow {
+        transform: scale(0.9);
+      }
+    }
+  }
+
+  &:disabled,
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// Dropdown Component Styles
+.dropdown {
+  position: relative;
+  width: 100%;
+
+  &-trigger {
+    @include button-reset;
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    // border: 1px solid $border-color;
+    // background-color: $background-white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color $transition-fast;
+    font-size: $font-size-base;
+
+    &:hover {
+      border-color: $primary-color;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &-icon {
+    transition: transform $transition-fast;
+    color: $text-secondary;
+    flex-shrink: 0;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: $background-white;
+    border-radius: 0.5rem;
+    outline: 1px solid #cacaca;
+    box-shadow: $shadow-lg;
+    z-index: $z-dropdown;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &-item {
+    @include button-reset;
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    text-align: left;
+    font-size: $font-size-base;
+    color: $text-primary;
+    transition: background-color $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $background-light;
+    }
+
+    &.selected {
+      background-color: $background-light;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// Accordion Component Styles
+.accordion {
+  border-bottom: 2px solid $border-color;
+  
+  &:first-child {
+    border-top: 2px solid $border-color;
+  }
+
+  &-header {
+    @include button-reset;
+    width: 100%;
+    padding: $spacing-lg 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  &-header-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex: 1;
+  }
+
+  &-header-left {
+    @include flex-column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  &-header-left-content {
+    @include flex-row;
+    align-items: baseline;
+    gap: $spacing-md;
+  }
+
+  &-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+  }
+
+  &-selected {
+    font-size: $font-size-base;
+    color: $text-secondary;
+    font-weight: $font-weight-normal;
+  }
+
+  &-count {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+
+  &-icon {
+    transition: transform $transition-base;
+    color: $text-secondary;
+    flex-shrink: 0;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &-content {
+    padding-bottom: $spacing-lg;
+    animation: slideDown $transition-base;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Rating Component Styles
+.rating {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  &-stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  &-star {
+    color: #fbbf24;
+    flex-shrink: 0;
+
+    &-empty {
+      color: $border-color;
+    }
+  }
+
+  &-count {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+}
+
+// Tabs Component Styles
+.tabs {
+    border: 1px solid $border-color;
+    padding-top: $spacing-md;
+    border-radius: $radius-md;
+
+  &-header {
+    display: flex;
+    gap: 0;
+    margin-bottom: $spacing-lg;
+    margin-inline: $spacing-md;
+    border-radius: 1.5rem;
+    outline: 1px solid black;
+    outline-offset: 2px;
+  }
+
+  &-tab {
+    width: 100%;
+    border-radius: 1.5rem;
+    @include button-reset;
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+    background-color: transparent;
+    border-bottom: 2px solid transparent;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      color: $text-primary;
+    }
+
+    &.active {
+      color: $text-primary;
+      background-color: $primary-color;
+      color: $background-white;
+    }
+  }
+
+  &-content {
+    min-height: 100px;
+  }
+}
+
+// Slider Component Styles
+.circular-gallery {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  position: relative;
+  
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// Header Component Styles
+.heading {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg; // gap-5 = 1.25rem
+
+  &.align-left {
+    align-items: flex-start;
+  }
+
+  &.align-center {
+    align-items: center;
+  }
+
+  
+// Label Styles (inline in header)
+.heading-label {
+  font-family: $font-family-primary;
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md; // py-2 px-4
+  width: fit-content;
+  justify-content: center;
+  gap: 0.625rem;
+  background-color: #dbdbdb; // grey background
+  border: 1px solid #bbbbbb;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+
+  &-text {
+    font-size: $font-size-xs;
+    line-height: 150%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: $text-primary; // black text
+
+  }
+
+  &.text-left {
+    text-align: left;
+  }
+
+  &.text-center {
+    text-align: center;
+  }
+}
+
+// Main Heading Styles
+.heading-main-heading {
+  max-width: 25ch;
+  color: $text-primary;
+  text-align: center;
+  font-family: $font-family-heading;
+  font-size: $font-size-5xl; // 48px
+  font-style: normal;
+  font-weight: 500; // font-extrabold
+  line-height: 120%;
+  letter-spacing: -0.96px;
+  word-spacing: 3px;
+
+  @include respond-to-max(2xsm) {
+    font-size: $font-size-4xl; // 42px
+  }
+
+  @include respond-to-max(3xsm) {
+    font-size: $font-size-5xl; // 4xl = 36px
+  }
+
+  &.text-left {
+    text-align: left;
+  }
+
+  &.text-center {
+    text-align: center;
+  }
+}
+
+// Subheading Styles
+.heading-subheading {
+  color: $text-secondary; // text-white/75
+  font-size: $font-size-xl; // text-xl
+  text-align: center;
+  max-width: 65ch;
+
+  @include respond-to-max(slg) {
+    font-size: $font-size-lg; // text-lg
+  }
+
+  @include respond-to-max(md) {
+    font-size: $font-size-base; // text-base
+  }
+
+  @include respond-to-max(2xsm) {
+    font-size: $font-size-sm; // 14.8px
+  }
+
+  @include respond-to-max(sm) {
+    max-width: none;
+  }
+
+  &.text-left {
+    text-align: left;
+  }
+
+  &.text-center {
+    text-align: center;
+  }
+}
+
+// Button Wrapper
+.heading-button-wrapper {
+  width: fit-content;
+
+  &.align-left {
+    margin-left: 0;
+  }
+
+  &.align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// Animated Word Styles (for GSAP animation)
+.heading-animated-word {
+  display: inline-block;
+
+  &.desc-word {
+    // Initial state for animation; GSAP will animate these
+    transform: translateY(10px);
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  &.space {
+    margin-left: $spacing-xs; // ml-1
+  }
+}
+}
+
+

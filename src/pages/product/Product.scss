@@ -3,21 +3,23 @@
 
 .product-page {
   min-height: 100vh;
-  padding: $spacing-xl 0;
+  // padding: $spacing-xl 0;
+  background-color: #ddd6c9;
 
   &-container {
     @include container;
-    max-width: 1400px;
+    max-width: unset;
+    padding: 0;
   }
 
   &-content {
     display: grid;
     grid-template-columns: 1fr;
-    gap: $spacing-2xl;
-
+    
     @include respond-to(lg) {
-      grid-template-columns: 1fr 1fr;
-      gap: $spacing-3xl;
+      grid-template-columns: 2fr 1fr;
+      // gap: $spacing-md;
+      // gap: $spacing-3xl;
     }
   }
 
@@ -26,13 +28,16 @@
     order: 1;
 
     @include respond-to(lg) {
+      padding: $spacing-md;
       order: 0;
     }
   }
 
   &-details {
     width: 100%;
-    order: 0;
+    order: 1;
+    padding: $spacing-md;
+    background-color: $background-white;
 
     @include respond-to(lg) {
       order: 1;

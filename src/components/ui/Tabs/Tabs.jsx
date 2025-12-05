@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './Tabs.scss';
+import '../ui.scss';
 
 const Tabs = ({ tabs, defaultTab, onTabChange }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);

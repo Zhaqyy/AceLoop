@@ -25,6 +25,35 @@
   }
 }
 
+// Max-width media query mixins (for max-* classes)
+@mixin respond-to-max($breakpoint) {
+  @if $breakpoint == 3xsm {
+    @media (max-width: $breakpoint-max-3xsm) {
+      @content;
+    }
+  } @else if $breakpoint == 2xsm {
+    @media (max-width: $breakpoint-max-2xsm) {
+      @content;
+    }
+  } @else if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm - 1px) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-md - 1px) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl - 1px) {
+      @content;
+    }
+  } @else if $breakpoint == slg {
+    @media (max-width: $breakpoint-max-slg) {
+      @content;
+    }
+  }
+}
+
 // Flexbox Mixins
 @mixin flex-center {
   display: flex;

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./Button.scss";
+import "../ui.scss";
 
 /* eslint-disable react/prop-types */
 /**

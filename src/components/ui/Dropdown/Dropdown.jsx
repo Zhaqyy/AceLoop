@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import './Dropdown.scss';
+import '../ui.scss';
 
 const Dropdown = ({ options, value, onChange, placeholder = 'Select...' }) => {
   const [isOpen, setIsOpen] = useState(false);

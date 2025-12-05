@@ -5,7 +5,7 @@ $accent-color: #d4af37;
 $text-primary: #1a1a1a;
 $text-secondary: #666666;
 $text-light: #999999;
-$border-color: #e0e0e0;
+$border-color: #5a5a5a;
 $background-light: #fafafa;
 $background-white: #ffffff;
 $error-color: #d32f2f;
@@ -33,6 +33,7 @@ $font-size-xl: 1.25rem;    // 20px
 $font-size-2xl: 1.5rem;    // 24px
 $font-size-3xl: 2rem;     // 32px
 $font-size-4xl: 2.5rem;    // 40px
+$font-size-5xl: 3rem;    // 48px
 
 $font-weight-normal: 400;
 $font-weight-medium: 500;
@@ -49,6 +50,11 @@ $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
 $breakpoint-2xl: 1536px;
+
+// Custom max-width breakpoints (for max-* classes)
+$breakpoint-max-3xsm: 360px;
+$breakpoint-max-2xsm: 480px;
+$breakpoint-max-slg: 1024px;
 
 // Border Radius
 $radius-sm: 0.25rem;   // 4px

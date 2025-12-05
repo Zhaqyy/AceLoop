@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Dropdown } from '../ui';
-import './ProductActions.scss';
+import './ProductComponents.scss';
 
 const ProductActions = ({ product, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
@@ -24,7 +24,7 @@ const ProductActions = ({ product, onAddToCart }) => {
     <div className="product-actions">
       <div className="product-actions-engagement">
         <p className="product-actions-engagement-text">
-          Customers love this. <strong>122 People</strong> purchased recently.
+          <strong>Customers love this.</strong> <em>122 People</em> purchased recently.
         </p>
       </div>
 
@@ -33,9 +33,9 @@ const ProductActions = ({ product, onAddToCart }) => {
           <span className="product-actions-price-amount">
             ${product?.price?.toLocaleString() || '3,199'} VAT included.
           </span>
-          <span className="product-actions-price-shipping">
+          <a href="#" className="product-actions-price-shipping">
             Plus shipping costs.
-          </span>
+          </a>
         </div>
         {monthlyPayment && (
           <p className="product-actions-payment-plan">

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import Accordion from '../ui/Accordion/Accordion';
 import Tabs from '../ui/Tabs/Tabs';
-import './CustomizationOptions.scss';
+import './ProductComponents.scss';
 
+/* eslint-disable react/prop-types */
 const CustomizationOptions = ({ options = {}, onOptionChange }) => {
   const [selectedOptions, setSelectedOptions] = useState({
     size: options.size?.selected || options.size?.options?.[0]?.value,
@@ -10,6 +11,8 @@ const CustomizationOptions = ({ options = {}, onOptionChange }) => {
     legStyle: options.legStyle?.selected || options.legStyle?.options?.[0]?.value,
     legFinish: options.legFinish?.selected || options.legFinish?.options?.[0]?.value,
   });
+
+  const [openAccordion, setOpenAccordion] = useState('upholstery'); // Default open
 
   const handleOptionChange = (category, value) => {
     setSelectedOptions((prev) => ({ ...prev, [category]: value }));
@@ -116,32 +119,58 @@ const CustomizationOptions = ({ options = {}, onOptionChange }) => {
     { value: 'stainless-steel', label: 'Stainless Steel', color: '#c0c0c0' },
   ];
 
+  // Get selected option labels
+  const selectedSizeLabel = sizeOptions.find(opt => opt.value === selectedOptions.size)?.label;
+  const selectedUpholsteryOption = [...fabricOptions, ...leatherOptions].find(
+    opt => opt.value === selectedOptions.upholstery
+  );
+  const selectedUpholsteryLabel = selectedUpholsteryOption
+    ? selectedUpholsteryOption.category
+      ? `${selectedUpholsteryOption.label} (${selectedUpholsteryOption.category})`
+      : selectedUpholsteryOption.label
+    : null;
+  const selectedLegStyleLabel = legStyleOptions.find(opt => opt.value === selectedOptions.legStyle)?.label;
+  const selectedLegFinishLabel = legFinishOptions.find(opt => opt.value === selectedOptions.legFinish)?.label;
+
+  const handleAccordionToggle = (accordionId) => {
+    setOpenAccordion((prev) => (prev === accordionId ? null : accordionId));
+  };
+
   return (
     <div className="customization-options">
       <Accordion
         title="Size"
         optionsCount={sizeOptions.length}
-        defaultOpen={false}
+        isOpen={openAccordion === 'size'}
+        onToggle={() => handleAccordionToggle('size')}
+        selectedValue={selectedSizeLabel}
       >
         <div className="customization-options-list">
-          {sizeOptions.map((option) => (
-            <button
-              key={option.value}
-              className={`customization-options-item ${
-                selectedOptions.size === option.value ? 'selected' : ''
-              }`}
-              onClick={() => handleOptionChange('size', option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
+          {sizeOptions.map((option) => {
+            // Extract size number from label (e.g., "85" from '85" Two-Cushion Sofa')
+            const sizeNumber = option.label.match(/^(\d+)/)?.[1] || option.value;
+            return (
+              <button
+                key={option.value}
+                className={`customization-options-item ${
+                  selectedOptions.size === option.value ? 'selected' : ''
+                }`}
+                onClick={() => handleOptionChange('size', option.value)}
+                title={option.label}
+              >
+                {sizeNumber}&quot;
+              </button>
+            );
+          })}
         </div>
       </Accordion>
 
       <Accordion
         title="Upholstery"
         optionsCount={fabricOptions.length + leatherOptions.length}
-        defaultOpen={true}
+        isOpen={openAccordion === 'upholstery'}
+        onToggle={() => handleAccordionToggle('upholstery')}
+        selectedValue={selectedUpholsteryLabel}
       >
         <Tabs tabs={upholsteryTabs} defaultTab="fabric" />
       </Accordion>
@@ -149,7 +178,9 @@ const CustomizationOptions = ({ options = {}, onOptionChange }) => {
       <Accordion
         title="Leg Style"
         optionsCount={legStyleOptions.length}
-        defaultOpen={true}
+        isOpen={openAccordion === 'legStyle'}
+        onToggle={() => handleAccordionToggle('legStyle')}
+        selectedValue={selectedLegStyleLabel}
       >
         <div className="customization-options-leg-styles">
           {legStyleOptions.map((option) => (
@@ -175,9 +206,11 @@ const CustomizationOptions = ({ options = {}, onOptionChange }) => {
       <Accordion
         title="Leg Finish"
         optionsCount={legFinishOptions.length}
-        defaultOpen={true}
+        isOpen={openAccordion === 'legFinish'}
+        onToggle={() => handleAccordionToggle('legFinish')}
+        selectedValue={selectedLegFinishLabel}
       >
-        <div className="customization-options-swatches">
+        <div className="customization-options-swatches customization-options-swatches--bordered">
           {legFinishOptions.map((option) => (
             <button
               key={option.value}

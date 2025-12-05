@@ -1,21 +1,40 @@
 import { useState } from 'react';
-import './Accordion.scss';
+import '../ui.scss';
 
-const Accordion = ({ title, children, defaultOpen = false, optionsCount }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+/* eslint-disable react/prop-types */
+const Accordion = ({ title, children, defaultOpen = false, isOpen: controlledIsOpen, onToggle, optionsCount, selectedValue }) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
+  
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle();
+    } else {
+      setInternalIsOpen(!internalIsOpen);
+    }
+  };
 
   return (
     <div className="accordion">
       <button
         className="accordion-header"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         aria-expanded={isOpen}
       >
         <div className="accordion-header-content">
-          <span className="accordion-title">{title}</span>
-          {optionsCount && (
-            <span className="accordion-count">{optionsCount} options</span>
-          )}
+          <div className="accordion-header-left">
+            <div className="accordion-header-left-content">
+            <span className="accordion-title">{title}</span>
+            {optionsCount && (
+              <span className="accordion-count">{optionsCount} options</span>
+            )}
+            </div>
+
+            {selectedValue && (
+              <span className="accordion-selected">{selectedValue}</span>
+            )}
+          </div>
         </div>
         <svg
           className={`accordion-icon ${isOpen ? 'open' : ''}`}

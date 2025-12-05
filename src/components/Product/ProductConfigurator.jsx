@@ -1,5 +1,5 @@
 import 'react';
-import './ProductConfigurator.scss';
+import './ProductComponents.scss';
 
 const ProductConfigurator = () => {
   return (

@@ -1,12 +1,14 @@
 import Hero from './sections/Hero';
+import Who from './sections/Who';
 import './home.scss';
 
 const Home = () => {
   return (
-    <div className="home-page">
+    <>
       <Hero />
+      <Who />
       {/* Add more sections here as needed */}
-    </div>
+    </>
   );
 };
 
