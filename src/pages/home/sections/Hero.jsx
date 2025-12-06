@@ -1,3 +1,4 @@
+import Heading from "@/components/ui/Heading/Heading";
 import CircularGallery from "@/components/ui/Slider/Slider";
 import { Button } from "@ui";
 
@@ -12,22 +13,20 @@ const Hero = () => {
   ]
   return (
     <section className="hero">
+      <div className="hero-imageUnderlay"></div>
       {/* <div className="hero-container"> */}
         <div className="hero-content">
           <div className="hero-textContent">
-            <div className="hero-textContentGroup">
-              <div className="hero-titleGroup">
-                <span className="hero-collection">AceLoop</span>
-                <h1 className="hero-title">Discover Timeless Elegance</h1>
-              </div>
-              <p className="hero-subtitle">
-                Transforming your space into a sanctuary of style and
-                sophistication.
-              </p>
-            </div>
+            <Heading
+              mainHeading="Discover Timeless Elegance"
+              mainHeadingClassName="hero-title"
+              subHeadingClassName="hero-subtitle"
+              subHeading="Transforming your space into a sanctuary of style and sophistication."
+              alignLeft={true}
+            />
             <div className="hero-ctaGroup">
               <div className="hero-ctaButton">
-                <Button variant="underline-arrow" to="/product">Collections</Button>
+                <Button variant="underline-arrow" to="/product" textColor="#f5f5f5" iconColor="#f5f5f5" underlineColor="#f5f5f5">Collections</Button>
               </div>
             </div>
           </div>

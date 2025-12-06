@@ -1,6 +1,6 @@
-@use 'sass:color';
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use "sass:color";
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
 
 // Button Component Styles
 .button {
@@ -15,33 +15,33 @@
   gap: $spacing-sm;
   text-decoration: none;
   cursor: pointer;
-  
+
   // Support for anchor tags and Link components
   &:is(a) {
     text-decoration: none;
   }
-  
+
   &.primary {
     background-color: $primary-color;
     color: $background-white;
     padding: $spacing-md $spacing-xl;
     font-size: $font-size-base;
     font-weight: $font-weight-medium;
-    
+
     &:hover:not(:disabled) {
       background-color: color.scale($primary-color, $lightness: -10%);
     }
   }
-  
+
   &.secondary {
     background-color: $secondary-color;
     color: $text-primary;
-    
+
     &:hover:not(:disabled) {
       background-color: color.scale($secondary-color, $lightness: -5%);
     }
   }
-  
+
   &.underline-arrow {
     border: none;
     background: none;
@@ -68,7 +68,7 @@
         height: 2px;
         bottom: -5px;
         left: 0;
-        background-color: $text-primary;
+        background-color: var(--underline-color, $text-primary);
         transform-origin: bottom right;
         transition: transform $transition-slow;
       }
@@ -180,7 +180,7 @@
 // Accordion Component Styles
 .accordion {
   border-bottom: 2px solid $border-color;
-  
+
   &:first-child {
     border-top: 2px solid $border-color;
   }
@@ -291,9 +291,9 @@
 
 // Tabs Component Styles
 .tabs {
-    border: 1px solid $border-color;
-    padding-top: $spacing-md;
-    border-radius: $radius-md;
+  border: 1px solid $border-color;
+  padding-top: $spacing-md;
+  border-radius: $radius-md;
 
   &-header {
     display: flex;
@@ -341,13 +341,13 @@
   overflow: hidden;
   cursor: grab;
   position: relative;
-  
+
   canvas {
     width: 100% !important;
     height: 100% !important;
     display: block;
   }
-  
+
   &:active {
     cursor: grabbing;
   }
@@ -368,130 +368,286 @@
     align-items: center;
   }
 
-  
-// Label Styles (inline in header)
-.heading-label {
-  font-family: $font-family-primary;
-  display: flex;
-  align-items: center;
-  padding: $spacing-sm $spacing-md; // py-2 px-4
-  width: fit-content;
-  justify-content: center;
-  gap: 0.625rem;
-  background-color: #dbdbdb; // grey background
-  border: 1px solid #bbbbbb;
-  border-radius: $radius-full;
-  font-size: $font-size-xs;
-
-  &-text {
+  // Label Styles (inline in header)
+  .heading-label {
+    font-family: $font-family-primary;
+    display: flex;
+    align-items: center;
+    padding: $spacing-sm $spacing-md; // py-2 px-4
+    width: fit-content;
+    justify-content: center;
+    gap: 0.625rem;
+    background-color: #dbdbdb; // grey background
+    border: 1px solid #bbbbbb;
+    border-radius: $radius-full;
     font-size: $font-size-xs;
-    line-height: 150%;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: $text-primary; // black text
 
+    &-text {
+      font-size: $font-size-xs;
+      line-height: 150%;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: $text-primary; // black text
+    }
+
+    &.text-left {
+      text-align: left;
+    }
+
+    &.text-center {
+      text-align: center;
+    }
   }
 
-  &.text-left {
-    text-align: left;
-  }
-
-  &.text-center {
+  // Main Heading Styles
+  .heading-main-heading {
+    max-width: 25ch;
+    color: $text-primary;
     text-align: center;
+    font-family: $font-family-heading;
+    font-size: $font-size-5xl; // 48px
+    font-style: normal;
+    font-weight: 500; // font-extrabold
+    line-height: 120%;
+    letter-spacing: -0.96px;
+    word-spacing: 3px;
+
+    @include respond-to-max(2xsm) {
+      font-size: $font-size-4xl; // 42px
+    }
+
+    @include respond-to-max(3xsm) {
+      font-size: $font-size-5xl; // 4xl = 36px
+    }
+
+    &.text-left {
+      text-align: left;
+    }
+
+    &.text-center {
+      text-align: center;
+    }
+  }
+
+  // Subheading Styles
+  .heading-subheading {
+    color: $text-secondary; // text-white/75
+    font-size: $font-size-xl; // text-xl
+    text-align: center;
+    max-width: 65ch;
+
+    @include respond-to-max(slg) {
+      font-size: $font-size-lg; // text-lg
+    }
+
+    @include respond-to-max(md) {
+      font-size: $font-size-base; // text-base
+    }
+
+    @include respond-to-max(2xsm) {
+      font-size: $font-size-sm; // 14.8px
+    }
+
+    @include respond-to-max(sm) {
+      max-width: none;
+    }
+
+    &.text-left {
+      text-align: left;
+    }
+
+    &.text-center {
+      text-align: center;
+    }
+  }
+
+  // Button Wrapper
+  .heading-button-wrapper {
+    width: fit-content;
+
+    &.align-left {
+      margin-left: 0;
+    }
+
+    &.align-center {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  // Animated Word Styles (for GSAP animation)
+  .heading-animated-word {
+    display: inline-block;
+
+    &.desc-word {
+      // Initial state for animation; GSAP will animate these
+      transform: translateY(10px);
+      opacity: 0;
+      filter: blur(10px);
+    }
+
+    &.space {
+      margin-left: $spacing-xs; // ml-1
+    }
   }
 }
 
-// Main Heading Styles
-.heading-main-heading {
-  max-width: 25ch;
-  color: $text-primary;
+// Gallery Component Styles
+.gallery {
+  width: 100%;
+  position: relative;
+
+  &-body {
+    width: 100%;
+  }
+
+  // Gallery Item Styles
+  .gallery-item {
+    display: flex;
+    width: 100%;
+    justify-content: end;
+    align-items: start;
+    padding: 25px 0px;
+    border-top: 1px solid rgb(201, 201, 201);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.32, 0, 0.67, 0);
+    opacity: 0.5;
+
+    &:last-of-type {
+      border-bottom: 1px solid rgb(201, 201, 201);
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:hover &-title {
+      transform: translateX(-10px);
+    }
+
+    &:hover &-description {
+      transform: translateX(10px);
+    }
+
+    &-title {
+      font-size: 50px;
+      margin: 0px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: -2px;
+      transition: all 0.4s;
+    }
+
+    &-description {
+      transition: all 0.4s;
+      font-weight: 300;
+      max-width: 25ch;
+    }
+  }
+
+  // Gallery Modal Styles
+  .gallery-modal {
+    &-container {
+      height: 350px;
+      width: 400px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: white;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+    }
+
+    &-slider {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      transition: top 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+  }
+
+  .gallery-modal {
+    height: 100%;
+    width: 100%;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    img {
+      height: auto;
+      // max-width: 100%;
+      // max-height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  // Gallery Cursor Styles
+  .gallery-cursor,
+  .gallery-cursor-label {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    color: black;
+    // background-color: $accent-color;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-3xl;
+    font-weight: 400;
+    pointer-events: none;
+    transform-origin: center center;
+  }
+
+  // TextRing when used as gallery cursor
+  .gallery-cursor.text-ring {
+    width: 80px;
+    height: 80px;
+    margin: 0;
+    
+    span {
+      font-size: $font-size-base;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      font-weight: 600;
+      color: black;
+    }
+  }
+
+  .gallery-cursor-label {
+    background-color: transparent;
+  }
+}
+
+.text-ring {
+  margin: 0 auto;
+  border-radius: 50%;
+  width: 200px;
+  position: relative;
+  height: 200px;
+  font-weight: bold;
+  color: #fff;
+  font-weight: 900;
   text-align: center;
-  font-family: $font-family-heading;
-  font-size: $font-size-5xl; // 48px
-  font-style: normal;
-  font-weight: 500; // font-extrabold
-  line-height: 120%;
-  letter-spacing: -0.96px;
-  word-spacing: 3px;
+  cursor: pointer;
+  transform-origin: 50% 50%;
+  -webkit-transform-origin: 50% 50%;
 
-  @include respond-to-max(2xsm) {
-    font-size: $font-size-4xl; // 42px
-  }
-
-  @include respond-to-max(3xsm) {
-    font-size: $font-size-5xl; // 4xl = 36px
-  }
-
-  &.text-left {
-    text-align: left;
-  }
-
-  &.text-center {
-    text-align: center;
+  span {
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    top: 0;
+    font-size: 24px;
+    transform-origin: center center;
+    white-space: nowrap;
+    will-change: transform;
   }
 }
-
-// Subheading Styles
-.heading-subheading {
-  color: $text-secondary; // text-white/75
-  font-size: $font-size-xl; // text-xl
-  text-align: center;
-  max-width: 65ch;
-
-  @include respond-to-max(slg) {
-    font-size: $font-size-lg; // text-lg
-  }
-
-  @include respond-to-max(md) {
-    font-size: $font-size-base; // text-base
-  }
-
-  @include respond-to-max(2xsm) {
-    font-size: $font-size-sm; // 14.8px
-  }
-
-  @include respond-to-max(sm) {
-    max-width: none;
-  }
-
-  &.text-left {
-    text-align: left;
-  }
-
-  &.text-center {
-    text-align: center;
-  }
-}
-
-// Button Wrapper
-.heading-button-wrapper {
-  width: fit-content;
-
-  &.align-left {
-    margin-left: 0;
-  }
-
-  &.align-center {
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-// Animated Word Styles (for GSAP animation)
-.heading-animated-word {
-  display: inline-block;
-
-  &.desc-word {
-    // Initial state for animation; GSAP will animate these
-    transform: translateY(10px);
-    opacity: 0;
-    filter: blur(10px);
-  }
-
-  &.space {
-    margin-left: $spacing-xs; // ml-1
-  }
-}
-}
-
-
