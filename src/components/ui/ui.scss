@@ -512,6 +512,7 @@
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.32, 0, 0.67, 0);
     opacity: 0.5;
+    position: relative;
 
     &:last-of-type {
       border-bottom: 1px solid rgb(201, 201, 201);
@@ -521,12 +522,20 @@
       opacity: 1;
     }
 
-    &:hover &-title {
-      transform: translateX(-10px);
+    // Animated line on hover
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: $primary-color;
+      transition: width 0.4s cubic-bezier(0.76, 0, 0.24, 1);
     }
 
-    &:hover &-description {
-      transform: translateX(10px);
+    &:hover::after {
+      width: 100%;
     }
 
     &-title {
@@ -535,14 +544,27 @@
       font-weight: 400;
       text-transform: uppercase;
       letter-spacing: -2px;
-      transition: all 0.4s;
+      transform: translateX(0);
+      transition: transform 0.4s ease;
+      display: inline-block;
     }
 
     &-description {
-      transition: all 0.4s;
+      transform: translateX(0);
+      transition: transform 0.4s ease;
       font-weight: 300;
       max-width: 25ch;
+      display: inline-block;
     }
+  }
+
+  // Hover states for gallery items
+  .gallery-item:hover .gallery-item-title {
+    transform: translateX(5px);
+  }
+
+  .gallery-item:hover .gallery-item-description {
+    transform: translateX(5px);
   }
 
   // Gallery Modal Styles

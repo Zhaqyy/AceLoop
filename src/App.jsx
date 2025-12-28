@@ -4,6 +4,7 @@ import Lenis from 'lenis';
 import Layout from '@layouts/Layout/Layout';
 import Home from '@pages/home/Home';
 import Product from '@pages/product/Product';
+import Work from '@pages/work/Work';
 import NotFound from '@pages/NotFound/NotFound';
 import './App.scss';
 
@@ -34,6 +35,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/work/:id" element={<Work />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
