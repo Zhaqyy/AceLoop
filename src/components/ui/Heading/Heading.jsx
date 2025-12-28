@@ -24,6 +24,8 @@ import '../ui.scss';
  * @param {Object} [props.subHeadingProps] - Additional props to pass to the subheading element (excluding className)
  * @param {string} [props.btnText] - Text for the optional button
  * @param {string} [props.btnUrl] - URL for the optional button
+ * @param {string} [props.btnVariant='underline-arrow'] - Button variant: 'primary', 'secondary', or 'underline-arrow'
+ * @param {Object} [props.btnProps] - Additional props to pass to the Button component (e.g., textColor, backgroundColor, iconColor, underlineColor, href, disabled, etc.)
  * @param {boolean} [props.alignLeft=false] - If true, aligns all text and button to the left
  * @param {string} [props.containerClassName] - Additional className for the container div
  * @param {Object} [props.containerProps] - Additional props to pass to the container div (excluding className)
@@ -42,6 +44,8 @@ const Heading = ({
   subHeadingProps = {},
   btnText,
   btnUrl = "#",
+  btnVariant = "underline-arrow",
+  btnProps = {},
   alignLeft = false,
   containerClassName = "",
   containerProps = {},
@@ -140,7 +144,7 @@ const Heading = ({
       {/* Button rendering */}
       {btnText && (
         <div className={`heading-button-wrapper ${buttonWrapperClass}`}>
-          <Button to={btnUrl} variant="underline-arrow">
+          <Button to={btnUrl} variant={btnVariant} {...btnProps}>
             {btnText}
           </Button>
         </div>
@@ -170,6 +174,8 @@ export default Heading;
     subHeadingProps={{ id: "sub-heading", "data-testid": "sub-heading" }}
     btnText="Get Started"
     btnUrl="/signup"
+    btnVariant="underline-arrow"
+    btnProps={{ textColor: "#000", iconColor: "#000" }}
     alignLeft={false}
     containerClassName="custom-container-class"
     containerProps={{ id: "heading-container", "data-section": "hero" }}
@@ -190,6 +196,8 @@ export default Heading;
     subHeadingProps={{ id: "about-subheading" }}
     btnText="Learn More"
     btnUrl="/about"
+    btnVariant="primary"
+    btnProps={{ backgroundColor: "#007bff", textColor: "#fff" }}
     alignLeft={true}
     containerClassName="about-container-class"
     containerProps={{ id: "about-container", "data-section": "about" }}
