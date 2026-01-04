@@ -4,6 +4,7 @@ import Services from './sections/Services';
 import Works from './sections/Works';
 import Faq from './sections/Faq';
 import CTA from './sections/CTA';
+import Footer from '@/components/Footer/Footer';
 import './home.scss';
 
 const Home = () => {
@@ -15,6 +16,7 @@ const Home = () => {
       <Works />
       <Faq />
       <CTA />
+      <Footer />
       {/* Add more sections here as needed */}
     </>
   );

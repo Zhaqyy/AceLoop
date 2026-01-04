@@ -1,0 +1,221 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.footer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: $background-white;
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-3xl $spacing-md;
+  padding-bottom: $spacing-3xl;
+
+  @include respond-to(lg) {
+    padding: $spacing-3xl $spacing-xl;
+    padding-bottom: $spacing-3xl;
+  }
+
+  // Top Section: Logo, Tagline, Social Icons
+  &-top {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-3xl;
+
+    @include respond-to(lg) {
+      margin-bottom: $spacing-3xl;
+    }
+  }
+
+  &-top-left {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &-logo {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    letter-spacing: -0.02em;
+  }
+
+  &-tagline {
+    p {
+      margin: 0;
+      color: $text-primary;
+      font-size: $font-size-sm;
+      line-height: $line-height-normal;
+    }
+  }
+
+  &-top-right {
+    display: flex;
+    align-items: center;
+  }
+
+  &-social {
+    display: flex;
+    gap: $spacing-md;
+    align-items: center;
+  }
+
+  &-social-link {
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color $transition-fast;
+    text-decoration: none;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      color: $text-secondary;
+    }
+  }
+
+  // Center Section: Large Brand Name
+  &-center {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    margin-bottom: $spacing-3xl;
+  }
+
+  &-brand {
+    font-size: clamp(4rem, 15vw, 12rem);
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    margin: 0;
+    text-align: center;
+
+    @include respond-to(lg) {
+      font-size: clamp(6rem, 20vw, 16rem);
+    }
+  }
+
+  // Bottom Section: Address, Navigation, Contact
+  &-bottom {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-3xl;
+    align-items: flex-start;
+
+    @include respond-to(md) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: $spacing-2xl;
+    }
+
+    @include respond-to(lg) {
+      gap: $spacing-3xl;
+    }
+  }
+
+  &-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &-left {
+    @include respond-to(md) {
+      gap: $spacing-xl;
+    }
+  }
+
+  &-middle,
+  &-right {
+    @include respond-to(md) {
+      gap: $spacing-xl;
+    }
+  }
+
+  &-address {
+    color: $text-primary;
+    font-size: $font-size-base;
+    line-height: $line-height-normal;
+
+    p {
+      margin: 0;
+      color: $text-primary;
+    }
+  }
+
+  &-email {
+    a {
+      color: $text-primary;
+      font-size: $font-size-base;
+      text-decoration: none;
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $text-secondary;
+      }
+    }
+  }
+
+  &-nav {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &-link {
+    color: $text-primary;
+    font-size: $font-size-base;
+    text-decoration: none;
+    transition: color $transition-fast;
+    display: inline-block;
+
+    &:hover {
+      color: $text-secondary;
+    }
+  }
+
+  &-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    background-color: $primary-color;
+    color: $background-white;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    margin-top: $spacing-md;
+    width: fit-content;
+
+    @include respond-to(md) {
+      margin-top: $spacing-lg;
+    }
+
+    &-icon {
+      font-weight: $font-weight-bold;
+      font-size: $font-size-xs;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &-text {
+      font-weight: $font-weight-medium;
+      letter-spacing: 0.02em;
+    }
+  }
+}
+
